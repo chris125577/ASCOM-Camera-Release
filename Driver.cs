@@ -6,7 +6,7 @@
 // Description:	Simple USB relay driver for camera operation
 //
 // Implements:	ASCOM Camera interface version: <1.0>
-// Author:		(CJW) Chris Woodhouse <chris@beyondmonochrome.co.uk>
+// Author:		(CJW) Chris Woodhouse <cwoodhou@icloud.com>
 //
 // Edit Log:
 //
