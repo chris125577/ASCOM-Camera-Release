@@ -64,12 +64,18 @@ namespace ASCOM.USB
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
         internal static string comPort; // Variables to hold the currrent device configuration
+
         // for serial commands
+        internal byte[] relaystatus = new byte[4]; // up to four characters in status string
+        internal byte[] command = new byte[4]; // up to four characters
+        internal byte txstringlen = 3;  // number of characters in command string
+        internal byte rxstringlen = 3; // number of characters in reply
         internal byte startByte = 0xFF;  // start character of relay command
-        internal byte[] relaystatus = new byte[3]; // FF 01 xx  xx= 01 for on 00 for off
-        internal byte[] command = new byte[3];
+        internal byte relaynumber = 0x01; // only one relay
         internal byte[] readrelay = new byte[] { 0xFF, 0x01, 0x03 }; //  read status command
-        internal byte setpin = 0x01, clearpin = 0x00;  // control bytes to set and reset relay
+        internal byte setpin = 0x01;
+        internal byte clearpin = 0x00;  // control bytes to set and reset relay
+        internal byte readpin = 0x03;
         private SerialPort Serial; // my serial port instance of ASCOM serial port
         /// <summary>
         /// Private variable to hold the connected state
@@ -131,11 +137,11 @@ namespace ASCOM.USB
         {
             if (connectedState)
             {
-                byte[] relaycmd = new byte[3];
+                byte[] relaycmd = new byte[4];
                 relaycmd[0] = startByte;
-                relaycmd[1] = 0x01;  // relay 1 (only 1)
+                relaycmd[1] = relaynumber;  // relay 1 (only 1)
                 relaycmd[2] = (byte)(setpin);  // byte for setting
-                Serial.Write(relaycmd, 0, 3);  // send command
+                Serial.Write(relaycmd, 0, txstringlen);  // send command
                 tl.LogMessage("SetSwitch", "0");
             }
         }
