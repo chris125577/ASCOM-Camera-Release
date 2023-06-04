@@ -65,17 +65,16 @@ namespace ASCOM.USB
         internal static string traceStateDefault = "false";
         internal static string comPort; // Variables to hold the currrent device configuration
 
-        // for serial commands
+        // for serial commands kmtronic
         internal byte[] relaystatus = new byte[4]; // up to four characters in status string
         internal byte[] command = new byte[4]; // up to four characters
-        internal byte txstringlen = 3;  // number of characters in command string
-        internal byte rxstringlen = 3; // number of characters in reply
-        internal byte startByte = 0xFF;  // start character of relay command
-        internal byte relaynumber = 0x01; // only one relay
-        internal byte[] readrelay = new byte[] { 0xFF, 0x01, 0x03 }; //  read status command
-        internal byte setpin = 0x01;
-        internal byte clearpin = 0x00;  // control bytes to set and reset relay
-        internal byte readpin = 0x03;
+        internal byte txstringlen = 3;  // number of characters in kmtronic command string
+        internal byte rxstringlen = 3; // number of characters in kmtronic reply
+        internal byte startByte = 0xFF;  // start character of kmtronic relay command
+        internal byte relaynumber = 0x01; // only one relay (kmtronic)
+        internal byte setpin = 0x01; // kmtronic
+        internal byte clearpin = 0x00;  // kmtronic control bytes to set and reset relay
+        internal byte readpin = 0x03; // kmtronic
         private SerialPort Serial; // my serial port instance of ASCOM serial port
         /// <summary>
         /// Private variable to hold the connected state
@@ -132,7 +131,7 @@ namespace ASCOM.USB
             return true;  
         }
        
-        // sets relay
+        // sets relay kmtronic
         private void SwitchOn()
         {
             if (connectedState)
@@ -140,38 +139,45 @@ namespace ASCOM.USB
                 byte[] relaycmd = new byte[4];
                 relaycmd[0] = startByte;
                 relaycmd[1] = relaynumber;  // relay 1 (only 1)
-                relaycmd[2] = (byte)(setpin);  // byte for setting
+                relaycmd[2] = setpin;  // byte for setting
+                //relaycmd[4] = something;
                 Serial.Write(relaycmd, 0, txstringlen);  // send command
                 tl.LogMessage("SetSwitch", "0");
             }
         }
    
-        // resets relay
+        // resets relay kmtronic
         private void SwitchOff()
         {
             if (connectedState)
             {
-                byte[] relaycmd = new byte[3];
+                byte[] relaycmd = new byte[4];
                 relaycmd[0] = startByte;
-                relaycmd[1] = 0x01;  // relay 1 (only 1)
-                relaycmd[2] = (byte)(clearpin);  // byte for setting
-                Serial.Write(relaycmd, 0, 3);  // send command
+                relaycmd[1] = relaynumber;  // relay 1 (only 1)
+                relaycmd[2] = clearpin;  // byte for setting
+                //relaycmd[4] = something;
+                Serial.Write(relaycmd, 0, txstringlen);  // send command
                 tl.LogMessage("SetSwitch", "0");
             }
         }
 
-        // checks relay status
+        // checks relay status kmtronic
         private bool GetSwitch()
         {
             try
             {
                 Serial.DiscardInBuffer(); // clear garbage
-                Serial.Write(readrelay, 0, 3); // send read relay command
-                for (int i = 0; i < 3; i++)  // read in 3  bytes  FF 01 xx
+                byte[] relaycmd = new byte[4];
+                relaycmd[0] = startByte;
+                relaycmd[1] = relaynumber;  // relay 1 (only 1)
+                relaycmd[2] = readpin;  // byte for setting
+                //relaycmd[4] = something;
+                Serial.Write(relaycmd, 0, txstringlen); // send read relay command
+                for (int i = 0; i < rxstringlen; i++)  // read in rxstringlen  bytes  FF 01 xx
                 {
                     relaystatus[i] = (byte)Serial.ReadByte();
                 }
-                return (relaystatus[2] > 0);
+                return (relaystatus[2] > 0); // you may need to check if this works.
             }
             catch
             {
@@ -1133,14 +1139,20 @@ namespace ASCOM.USB
         /// </summary>
         private bool IsConnected
         {
-            get
+            get // kmtronic
             {
-                Serial.Write(readrelay, 0, 3); // send read relay command
-                for (int i = 0; i < 3; i++)  // read in 3  bytes  FF 01 xx
+                Serial.DiscardInBuffer(); // clear garbage
+                byte[] relaycmd = new byte[4];
+                relaycmd[0] = startByte;
+                relaycmd[1] = relaynumber;  // relay 1 (only 1)
+                relaycmd[2] = readpin;  // byte for setting
+                //relaycmd[4] = something;
+                Serial.Write(relaycmd, 0, txstringlen); // send read relay command
+                for (int i = 0; i < rxstringlen; i++)  // read in rxstringlen  bytes  FF 01 xx yy
                 {
                     relaystatus[i] = (byte)Serial.ReadByte();
                 }
-                return (relaystatus[1] == 1);
+                return (relaystatus[1] == 1);  // you may need to check this is valid for your system
             }
         }
 
