@@ -1183,7 +1183,7 @@ namespace ASCOM.USB
                 comPort = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
                 pixelSize = double.Parse(driverProfile.GetValue(driverID, "pixel size", string.Empty, pixelsizeDefault));
                 ccdWidth = int.Parse(driverProfile.GetValue(driverID, "width", string.Empty, pixelwidthDefault));
-                ccdWidth = int.Parse(driverProfile.GetValue(driverID, "height", string.Empty, pixelheightDefault));
+                ccdHeight = int.Parse(driverProfile.GetValue(driverID, "height", string.Empty, pixelheightDefault));
             }
         }
 

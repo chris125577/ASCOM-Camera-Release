@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using ASCOM.Utilities;
 using ASCOM.USB;
+using ASCOM.DeviceInterface;
 
 namespace ASCOM.USB
 {
@@ -64,6 +65,9 @@ namespace ASCOM.USB
             {
                 comboBoxComPort.SelectedItem = Camera.comPort;
             }
+            heighttext.Value = (int)Camera.ccdHeight;
+            widthtext.Value = (int)Camera.ccdWidth;
+            pixeltext.Value = (decimal)Camera.pixelSize;
         }
     }
 }
