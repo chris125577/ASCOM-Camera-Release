@@ -16,7 +16,7 @@
 // 12-Sep-2019  CJW 1.1.1   Adding in larger file-based image and tidying up abort, stop and gets
 // 14-Sep-2019  CJW 1.2     Working with % complete and file transfer to imaging app
 // May 2020 -   CJW 1.3     scaled 8-bit dummy image, as I realized that file transfer assumes 16-bit format.
-// Sep 2023 -   CJW 1.4     added extra ASCOM settings for pixel sizes
+// Sep 2023 -   CJW 1.4     added extra ASCOM settings for pixel sizes - dummy camera file is now called dummy.jpg
 // --------------------------------------------------------------------------------
 //
 
