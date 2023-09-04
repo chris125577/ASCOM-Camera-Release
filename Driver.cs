@@ -15,7 +15,8 @@
 // 05-Sep-2019	CJW	1.0.0	Initial edit, created from ASCOM driver template - conformed
 // 12-Sep-2019  CJW 1.1.1   Adding in larger file-based image and tidying up abort, stop and gets
 // 14-Sep-2019  CJW 1.2     Working with % complete and file transfer to imaging app
-// May 2020 - scaled 8-bit dummy image, as I realized that file transfer assumes 16-bit format.
+// May 2020 -   CJW 1.3     scaled 8-bit dummy image, as I realized that file transfer assumes 16-bit format.
+// Sep 2023 -   CJW 1.4     added extra ASCOM settings for pixel sizes
 // --------------------------------------------------------------------------------
 //
 
@@ -61,9 +62,14 @@ namespace ASCOM.USB
 
         internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
         internal static string comPortDefault = "COM1";
+        internal static string pixelsizeDefault = "5.0";
+        internal static string pixelwidthDefault = "600";
+        internal static string pixelheightDefault = "400";
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
         internal static string comPort; // Variables to hold the currrent device configuration
+        internal static double  pixelSize;
+        internal static int ccdWidth, ccdHeight;
 
         // for serial commands kmtronic
         internal byte[] relaystatus = new byte[4]; // up to four characters in status string
@@ -349,17 +355,14 @@ namespace ASCOM.USB
         private double exposureDuration;
         private double cameraLastExposureDuration = 0.0;
         internal short gain = 10;
-        private const int ccdWidth = 600; // Constants to define the ccd pixel dimenstions
-        private const int ccdHeight = 600;
-        private const double pixelSize = 5.0; // Constant for the pixel physical dimension
         internal CameraStates status;
-        private int cameraNumX = ccdWidth; // Initialise variables to hold values required for functionality tested by Conform
-        private int cameraNumY = ccdHeight;
+        private int cameraNumX = Camera.ccdWidth; // Initialise variables to hold values required for functionality tested by Conform
+        private int cameraNumY = Camera.ccdHeight;
         private int cameraStartX = 0;
         private int cameraStartY = 0;
 
         // camera image
-        internal String imagePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\ASCOM\\Camera\\usb-icon600x600.jpg";
+        internal String imagePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\ASCOM\\Camera\\dummy.jpg";
         private Bitmap bmp;
         private float[,,] imageData;    // room for a monochrome image
         private int[,] imageArray;  // array for sending image over
@@ -1178,6 +1181,9 @@ namespace ASCOM.USB
                 driverProfile.DeviceType = "Camera";
                 tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
                 comPort = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
+                pixelSize = double.Parse(driverProfile.GetValue(driverID, "pixel size", string.Empty, pixelsizeDefault));
+                ccdWidth = int.Parse(driverProfile.GetValue(driverID, "width", string.Empty, pixelwidthDefault));
+                ccdWidth = int.Parse(driverProfile.GetValue(driverID, "height", string.Empty, pixelheightDefault));
             }
         }
 
@@ -1191,6 +1197,9 @@ namespace ASCOM.USB
                 driverProfile.DeviceType = "Camera";
                 driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
                 driverProfile.WriteValue(driverID, comPortProfileName, comPort.ToString());
+                driverProfile.WriteValue(driverID, "pixel size", pixelSize.ToString());
+                driverProfile.WriteValue(driverID, "width", ccdWidth.ToString());
+                driverProfile.WriteValue(driverID, "height", ccdHeight.ToString());
             }
         }
 

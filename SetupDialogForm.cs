@@ -25,6 +25,9 @@ namespace ASCOM.USB
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
             Camera.comPort = (string)comboBoxComPort.SelectedItem;
+            Camera.ccdHeight = (int)heighttext.Value;
+            Camera.ccdWidth = (int)widthtext.Value;
+            Camera.pixelSize = (double)pixeltext.Value;
             Camera.tl.Enabled = chkTrace.Checked;
         }
 
